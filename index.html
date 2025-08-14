@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אסטרטגיית העברת מערכת</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            direction: rtl;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .stage-indicator {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stage-dots {
+            display: inline-flex;
+            gap: 15px;
+            align-items: center;
+            direction: ltr;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #4CAF50;
+            transform: scale(1.3);
+        }
+
+        .stage-label {
+            font-size: 1.1rem;
+            color: #333;
+            margin-right: 20px;
+            font-weight: 600;
+        }
+
+        .migration-area {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            min-height: 300px;
+        }
+
+        .system-container {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .system-container.legacy {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+        }
+
+        .system-container.modern {
+            border-color: #51cf66;
+            background: linear-gradient(135deg, #f3ffe3 0%, #e3f7e3 100%);
+        }
+
+        .system-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid;
+        }
+
+        .legacy .system-title {
+            color: #e03131;
+            border-color: #ff6b6b;
+        }
+
+        .modern .system-title {
+            color: #2b8a3e;
+            border-color: #51cf66;
+        }
+
+        .items-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            min-height: 200px;
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .item:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .program {
+            background: linear-gradient(135deg, #4c6ef5 0%, #364fc7 100%);
+            color: white;
+            border: 2px solid #4c6ef5;
+        }
+
+        .tool {
+            background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+            color: white;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #fd7e14;
+        }
+
+        .item-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            direction: ltr;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auto-btn {
+            background: linear-gradient(135deg, #51cf66 0%, #2b8a3e 100%);
+        }
+
+        .migration-arrow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            font-size: 3rem;
+            color: #667eea;
+            z-index: 10;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) translateY(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1.1); }
+        }
+
+        /* Animation classes for migrating items */
+        .item.migrating {
+            transform: translateX(-200px);
+            opacity: 0.7;
+            z-index: 100;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #adb5bd;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .migration-area {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .migration-arrow {
+                transform: rotate(90deg) translateX(-50%);
+                top: 50%;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">אסטרטגיית העברת מערכת</h1>
+        <p class="subtitle">מעבר מתשתית מורשת למודרנית</p>
+        
+        <div class="stage-indicator">
+            <div class="stage-dots">
+                <span class="stage-label">שלב 1: מצב התחלתי</span>
+                <div class="dot active" data-stage="1"></div>
+                <div class="dot" data-stage="2"></div>
+                <div class="dot" data-stage="3"></div>
+            </div>
+        </div>
+
+        <div class="migration-area">
+            <div class="system-container modern">
+                <h2 class="system-title">🚀 מערכת מודרנית</h2>
+                <div class="items-container" id="modern-container">
+                    <!-- Items will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="migration-arrow">⬅️</div>
+
+            <div class="system-container legacy">
+                <h2 class="system-title">🏗️ מערכת מורשת</h2>
+                <div class="items-container" id="legacy-container">
+                    <!-- Items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prev-btn" onclick="previousStage()">⬅️ קודם</button>
+            <button class="btn auto-btn" id="auto-btn" onclick="toggleAuto()">▶️ הפעלה אוטומטית</button>
+            <button class="btn" id="next-btn" onclick="nextStage()">הבא ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 1;
+        let isAutoPlay = false;
+        let autoInterval;
+
+        const programs = [
+            { name: 'DNBI', icon: '💼' },
+            { name: 'TZM', icon: '📊' },
+            { name: 'NPN', icon: '🔢' },
+            { name: 'DPT', icon: '📋' }
+        ];
+
+        const tools = [
+            { name: 'Merlin', icon: '🔮' },
+            { name: 'VaxWing', icon: '💉' },
+            { name: 'Pshigur', icon: '⚙️' },
+            { name: 'EngrIT', icon: '🔧' },
+            { name: 'DPT-Tables', icon: '📊' }
+        ];
+
+        function createItemElement(item, type) {
+            const div = document.createElement('div');
+            div.className = `item ${type}`;
+            div.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div>${item.name}</div>
+            `;
+            return div;
+        }
+
+        function renderStage(stage) {
+            const legacyContainer = document.getElementById('legacy-container');
+            const modernContainer = document.getElementById('modern-container');
+            
+            // Clear containers
+            legacyContainer.innerHTML = '';
+            modernContainer.innerHTML = '';
+
+            switch(stage) {
+                case 1:
+                    // All items in legacy
+                    programs.forEach(program => {
+                        legacyContainer.appendChild(createItemElement(program, 'program'));
+                    });
+                    tools.forEach(tool => {
+                        legacyContainer.appendChild(createItemElement(tool, 'tool'));
+                    });
+                    modernContainer.innerHTML = '<div class="empty-state">ממתין להעברה...</div>';
+                    break;
+
+                case 2:
+                    // Programs in modern, tools in legacy
+                    tools.forEach(tool => {
+                        legacyContainer.appendChild(createItemElement(tool, 'tool'));
+                    });
+                    programs.forEach(program => {
+                        modernContainer.appendChild(createItemElement(program, 'program'));
+                    });
+                    break;
+
+                case 3:
+                    // All items in modern
+                    legacyContainer.innerHTML = '<div class="empty-state">ההעברה הושלמה!</div>';
+                    programs.forEach(program => {
+                        modernContainer.appendChild(createItemElement(program, 'program'));
+                    });
+                    tools.forEach(tool => {
+                        modernContainer.appendChild(createItemElement(tool, 'tool'));
+                    });
+                    break;
+            }
+
+            updateStageIndicator(stage);
+            updateControls();
+        }
+
+        function updateStageIndicator(stage) {
+            const dots = document.querySelectorAll('.dot');
+            const stageLabel = document.querySelector('.stage-label');
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === stage);
+            });
+
+            const stageLabels = [
+                'שלב 1: מצב התחלתי - כל המערכות במורשת',
+                'שלב 2: תוכנות הועברו - אפליקציות עברו למודרנית',
+                'שלב 3: העברה מושלמת - כל המערכות מודרניות'
+            ];
+            
+            stageLabel.textContent = stageLabels[stage - 1];
+        }
+
+        function updateControls() {
+            document.getElementById('prev-btn').disabled = currentStage === 1;
+            document.getElementById('next-btn').disabled = currentStage === 3;
+        }
+
+        function nextStage() {
+            if (currentStage < 3) {
+                currentStage++;
+                renderStage(currentStage);
+            }
+        }
+
+        function previousStage() {
+            if (currentStage > 1) {
+                currentStage--;
+                renderStage(currentStage);
+            }
+        }
+
+        function toggleAuto() {
+            const autoBtn = document.getElementById('auto-btn');
+            
+            if (isAutoPlay) {
+                clearInterval(autoInterval);
+                isAutoPlay = false;
+                autoBtn.innerHTML = '▶️ הפעלה אוטומטית';
+            } else {
+                isAutoPlay = true;
+                autoBtn.innerHTML = '⏸️ השהה';
+                autoInterval = setInterval(() => {
+                    if (currentStage < 3) {
+                        nextStage();
+                    } else {
+                        currentStage = 1;
+                        renderStage(currentStage);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize
+        renderStage(1);
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === ' ') {
+                nextStage();
+            } else if (e.key === 'ArrowRight') {
+                previousStage();
+            }
+        });
+    </script>
+</body>
+</html>
