@@ -91,7 +91,7 @@ body {
     transition: all 0.5s ease;
     transform: translateY(20px);
     opacity: 0;
-    animation: containerAppear 1s ease forwards;
+    animation: containerAppear 0.6s ease forwards;
 }
 
 .system-container.legacy {
@@ -127,7 +127,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 15px;
-    min-height: 250px;
+    /* min-height: 250px; */
 
 }
 
@@ -146,7 +146,7 @@ body {
     overflow: hidden;
     transform: scale(0);
     opacity: 0;
-    animation: itemAppear 0.6s ease forwards;
+    animation: itemAppear 0.4s ease forwards;
 }
 
 .item.visible {
@@ -234,11 +234,11 @@ body {
 }
 
 .item.disappearing {
-    animation: itemDisappear 0.8s ease forwards;
+    animation: itemDisappear 0.5s ease forwards;
 }
 
 .item.migrating {
-    animation: itemMigrate 1.5s ease forwards;
+    animation: itemMigrate 0.9s ease forwards;
 }
 
 .program {
@@ -258,6 +258,36 @@ body {
     font-size: 0.75rem;
     padding: 8px;
 }
+
+.modern-tool {
+    background: linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%);
+    color: white;
+    border-radius: 15px;
+    border: 2px solid #845ef7;
+    font-size: 0.8rem;
+    padding: 15px;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(132, 94, 247, 0.3);
+}
+
+.modern-tool::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.modern-tool:hover::before {
+    left: 100%;
+}
+
+
 
 .item-icon {
     font-size: 1.8rem;
@@ -308,7 +338,7 @@ body {
     font-size: 2rem;
     color: #667eea;
     z-index: 10;
-    animation: pulse 2s ease-in-out infinite;
+    animation: pulse 1.2s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -327,7 +357,197 @@ body {
 
 /* Animation classes for migrating items */
 .item.migrating {
-    animation: itemMigrate 1.5s ease forwards;
+    animation: itemMigrate 0.9s ease forwards;
+}
+
+.item.migrating-to-vm {
+    animation: migrateToVM 1.2s ease forwards;
+}
+
+.item.transforming {
+    animation: transformToModern 1.5s ease forwards;
+}
+
+@keyframes migrateToVM {
+    0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(-100px) scale(0.8) rotate(-15deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateX(-200px) scale(0.6) rotate(-30deg);
+        opacity: 0;
+    }
+}
+
+@keyframes transformToModern {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+        background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+    }
+    25% {
+        transform: scale(1.2) rotate(90deg);
+        opacity: 0.8;
+        background: linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%);
+    }
+    50% {
+        transform: scale(0.8) rotate(180deg);
+        opacity: 0.6;
+        background: linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%);
+    }
+    75% {
+        transform: scale(1.1) rotate(270deg);
+        opacity: 0.8;
+        background: linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 0;
+        background: linear-gradient(135deg, #845ef7 0%, #5f3dc4 100%);
+    }
+}
+
+/* VM Container Styles */
+.vm-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #6c757d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    animation: containerAppear 0.5s ease forwards;
+}
+
+.modern-tools-container {
+    background: linear-gradient(135deg, #f3f0ff 0%, #e5dbff 100%);
+    border: 2px solid #845ef7;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(132, 94, 247, 0.2);
+}
+
+.modern-tools-container .container-title {
+    color: #5f3dc4;
+    border-color: #845ef7;
+    font-size: 1.3rem;
+}
+
+
+
+.container-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    color: #495057;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #6c757d;
+}
+
+.container-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    min-height: 120px;
+}
+
+/* Override for stage 4 to make tools horizontal */
+.system-container.stage-4 .vm-container .container-content {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+    min-height: auto !important;
+}
+
+/* Override for stage 5 to make modern tools horizontal (same as stage 4) */
+.system-container.stage-5 .modern-tools-container .container-content {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+    min-height: auto !important;
+}
+
+/* Ensure tools in stage 4 container display horizontally */
+.system-container.stage-4 .vm-container .container-content .tool {
+    flex-shrink: 0 !important;
+    margin: 0 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure modern tools in stage 5 container display horizontally */
+.system-container.stage-5 .modern-tools-container .container-content .modern-tool {
+    flex-shrink: 0 !important;
+    margin: 0 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure programs in stage 4 items container display horizontally */
+.system-container.stage-4 .items-container .program {
+    flex-shrink: 0 !important;
+    margin: 0 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Modern container layout for stage 4 */
+.system-container.stage-4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.system-container.stage-4 .vm-container {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.system-container.stage-4 .items-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Modern container layout for stage 5 (same as stage 4) */
+.system-container.stage-5 {
+    display: flex;
+    flex-direction: column;
+}
+
+.system-container.stage-5 .modern-tools-container {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.system-container.stage-5 .items-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 .empty-state {
@@ -339,7 +559,7 @@ body {
     font-style: italic;
     font-size: 1.1rem;
     opacity: 0;
-    animation: fadeIn 1s ease forwards 0.5s;
+    animation: fadeIn 0.6s ease forwards 0.3s;
 }
 
 @keyframes fadeIn {
